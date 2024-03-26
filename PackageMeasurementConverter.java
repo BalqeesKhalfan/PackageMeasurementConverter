@@ -9,45 +9,48 @@ public class PackageMeasurementConverter {
         String userInput=scanner.nextLine();
         scanner.close();
         // Call the measurementConverter method to convert the input string
-        List<Integer> convertedValues =  measurmentConverter(userInput);
+        List<Integer> convertedValues =  measurementConverter(userInput.toLowerCase());
         // Print the input string  with the converted values
         System.out.println("Input: " +userInput + " =>  Measurement : " + convertedValues);
 
     }
     // Method to convert the measurement string into numerical values
-    public static List<Integer> measurmentConverter(String convertString) {
+    public static List<Integer> measurementConverter(String convertString) {
         List<Integer> convertedValues = new ArrayList<>();
         int currentIndex = 0;
         while (currentIndex< convertString.length()) {
             char ch = convertString.charAt(currentIndex);
-            int currentValueNum = 0;
+            Integer currentValueNum = 0;
             if (ch >= 'a' && ch<= 'z') {
-                int count = ch - 'a' + 1;
+                int count = ch - 'a' + 1;//dealing with Ascii
                 currentIndex++;
-                String sequence = "";
+                StringBuilder sequence = new StringBuilder();
                 boolean zEncountered = false; // Flag to track if 'z' is encountered within the sequence
-                for (int i = 0; i < count && currentIndex < convertString.length(); i++) {
+
+                int i = 0;
+                while (i < count && currentIndex < convertString.length()) {
                     char nextChar = convertString.charAt(currentIndex++);
                     if (nextChar == 'z') {
-                        sequence += nextChar;
+                        sequence.append(nextChar);
                         // Count consecutive 'z' characters and the next character
                         while (currentIndex < convertString.length() && convertString.charAt(currentIndex) == 'z') {
-                            sequence += convertString.charAt(currentIndex++);
+                            sequence.append(convertString.charAt(currentIndex++));
                         }
                         if (currentIndex < convertString.length()) {
-                            sequence += convertString.charAt(currentIndex++);
+                            sequence.append(convertString.charAt(currentIndex++));
                         }
                     } else if ((nextChar >= 'a' && nextChar <= 'z') || isNonAlphabetical(nextChar)) {
-                        sequence += nextChar;
+                        sequence.append(nextChar);
                         zEncountered = false;
                     } else {
                         currentIndex--; // Move back one step to process the non-alphabetical character again
                         break;
                     }
+                    i++;
                 }
                 // Calculate value for the sequence if 'z' is not encountered or if it's the last character of the sequence
                 if (!zEncountered || sequence.charAt(sequence.length() - 1) == 'z') {
-                    currentValueNum = calculateValue(sequence);
+                    currentValueNum = calculateValue(sequence.toString());
                     convertedValues.add(currentValueNum);
                 }
             } else {
@@ -57,11 +60,11 @@ public class PackageMeasurementConverter {
         return convertedValues;
     }
 
-    /** Method nonAlphaatical checker*/
+    /** Method to check if the character is non-alphabetical */
     public static boolean isNonAlphabetical(char character) {
         return "@!#$%^&*()_<>{}[]".indexOf(character) != -1;
     }
-    /**Calculates the value of the given input string.*/
+    /** Calculates the value of the given input string. */
     public static int calculateValue(String input) {
         int value = 0;
         for (char letter : input.toCharArray()) {
